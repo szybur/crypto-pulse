@@ -11,7 +11,8 @@ val appModule = module {
 
     single {
         provideCoinGeckoHttpClient(
-            apiKey = System.getenv("COINGECKO_DEMO_API_KEY") ?: ""
+            apiKey = System.getProperty("COINGECKO_DEMO_API_KEY")
+                ?: error("Missing COINGECKO_DEMO_API_KEY")
         )
     }
 

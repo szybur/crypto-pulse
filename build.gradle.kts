@@ -1,3 +1,18 @@
+import java.util.Properties
+
+val localProperties = Properties().apply {
+    val localFile = rootProject.file("local.properties")
+    if (localFile.exists()) {
+        localFile.inputStream().use { load(it) }
+    }
+}
+
+val coinGeckoApiKey = localProperties.getProperty("coingecko.demo.api.key", "")
+
+tasks.withType<JavaExec>().configureEach {
+    systemProperty("COINGECKO_DEMO_API_KEY", coinGeckoApiKey)
+}
+
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.serialization)
