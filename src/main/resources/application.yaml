@@ -1,6 +1,6 @@
 ktor:
     application:
         modules:
-            - pl.szybur.ApplicationKt.module
+            - com.pulse.crypto.ApplicationKt.module
     deployment:
         port: 8080

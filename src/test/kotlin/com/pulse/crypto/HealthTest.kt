@@ -7,16 +7,16 @@ import io.ktor.server.testing.testApplication
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class ApplicationTest {
+class HealthTest {
 
     @Test
-    fun testRoot() = testApplication {
+    fun `test health endpoint`() = testApplication {
         application {
             module()
         }
-        val response = client.get("/")
+        val response = client.get("/health")
 
         assertEquals(HttpStatusCode.OK, response.status)
-        assertEquals("Hello World!", response.bodyAsText())
+        assertEquals("Healthy", response.bodyAsText())
     }
 }
