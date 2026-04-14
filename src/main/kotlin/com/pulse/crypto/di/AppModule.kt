@@ -1,8 +1,20 @@
 package com.pulse.crypto.di
 
+import com.pulse.crypto.clients.CoinGeckoClient
+import com.pulse.crypto.clients.provideCoinGeckoHttpClient
+import com.pulse.crypto.services.AssetService
 import com.pulse.crypto.services.HealthService
 import org.koin.dsl.module
 
 val appModule = module {
     single { HealthService() }
+
+    single {
+        provideCoinGeckoHttpClient(
+            apiKey = System.getenv("COINGECKO_DEMO_API_KEY") ?: ""
+        )
+    }
+
+    single { CoinGeckoClient(get()) }
+    single { AssetService(get()) }
 }

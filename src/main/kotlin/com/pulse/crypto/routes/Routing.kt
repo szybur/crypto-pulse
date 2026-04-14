@@ -6,5 +6,6 @@ import io.ktor.server.routing.routing
 fun Application.configureRoutes() {
     routing {
         healthRoutes()
+        assetRoutes()
     }
 }
