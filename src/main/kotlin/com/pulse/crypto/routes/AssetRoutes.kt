@@ -42,4 +42,40 @@ fun Route.assetRoutes() {
             )
         }
     }
+
+    get("/api/assets/{id}/history") {
+        val id = call.parameters["id"]?.trim()
+        val days = call.request.queryParameters["days"]?.toIntOrNull() ?: 7
+
+        if (id.isNullOrBlank()) {
+            call.respond(
+                HttpStatusCode.BadRequest,
+                mapOf("error" to "Missing or blank asset id")
+            )
+            return@get
+        }
+
+        if (days <= 0) {
+            call.respond(
+                HttpStatusCode.BadRequest,
+                mapOf("error" to "Query parameter 'days' must be greater than 0")
+            )
+            return@get
+        }
+
+        try {
+            val history = assetService.getAssetHistory(id, days)
+            call.respond(HttpStatusCode.OK, history)
+        } catch (e: CoinNotFoundException) {
+            call.respond(
+                HttpStatusCode.NotFound,
+                mapOf("error" to "Asset '${e.coinId}' not found")
+            )
+        } catch (e: CoinGeckoException) {
+            call.respond(
+                HttpStatusCode.BadGateway,
+                mapOf("error" to (e.message ?: "Upstream API error"))
+            )
+        }
+    }
 }

@@ -2,7 +2,9 @@ package com.pulse.crypto.models.mappers
 
 import com.pulse.crypto.models.domain.AssetDetails
 import com.pulse.crypto.models.domain.AssetSummary
+import com.pulse.crypto.models.domain.PricePoint
 import com.pulse.crypto.models.dto.CoinDetailsDto
+import com.pulse.crypto.models.dto.CoinMarketChartDto
 import com.pulse.crypto.models.dto.CoinMarketDto
 
 fun CoinMarketDto.toDomain(): AssetSummary =
@@ -30,3 +32,16 @@ fun CoinDetailsDto.toDomain(): AssetDetails =
         marketCapRank = marketCapRank,
         priceChangePercentage24h = marketData?.priceChangePercentage24h
     )
+
+fun CoinMarketChartDto.toPricePoints(): List<PricePoint> =
+    prices.mapNotNull { point ->
+        if (point.size < 2) return@mapNotNull null
+
+        val timestamp = point[0].toLong()
+        val price = point[1]
+
+        PricePoint(
+            timestamp = timestamp,
+            price = price
+        )
+    }

@@ -5,9 +5,12 @@ import com.pulse.crypto.clients.exceptions.CoinGeckoException
 import com.pulse.crypto.clients.exceptions.CoinNotFoundException
 import com.pulse.crypto.models.domain.AssetDetails
 import com.pulse.crypto.models.domain.AssetSummary
+import com.pulse.crypto.models.domain.PricePoint
 import com.pulse.crypto.models.dto.CoinDetailsDto
+import com.pulse.crypto.models.dto.CoinMarketChartDto
 import com.pulse.crypto.models.dto.CoinMarketDto
 import com.pulse.crypto.models.mappers.toDomain
+import com.pulse.crypto.models.mappers.toPricePoints
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.ClientRequestException
@@ -85,5 +88,44 @@ class CoinGeckoClient(
         }
 
         return dto.toDomain()
+    }
+
+    suspend fun getAssetHistory(
+        id: String,
+        days: Int = 7,
+        vsCurrency: String = "usd"
+    ): List<PricePoint> {
+        require(id.isNotBlank()) { "Coin id must not be blank" }
+        require(days > 0) { "Days must be greater than 0" }
+
+        val response = try {
+            httpClient.get("coins/$id/market_chart") {
+                parameter("vs_currency", vsCurrency)
+                parameter("days", days)
+                parameter("interval", "hourly")
+            }
+        } catch (e: ClientRequestException) {
+            if (e.response.status == HttpStatusCode.NotFound) {
+                throw CoinNotFoundException(id)
+            }
+            throw CoinGeckoException("CoinGecko request failed for history id '$id'", e)
+        } catch (e: Exception) {
+            throw CoinGeckoException("Failed to fetch asset history for '$id'", e)
+        }
+
+        if (!response.status.isSuccess()) {
+            if (response.status == HttpStatusCode.NotFound) {
+                throw CoinNotFoundException(id)
+            }
+            throw CoinGeckoException("CoinGecko returned HTTP ${response.status.value} for history id '$id'")
+        }
+
+        val dto = try {
+            response.body<CoinMarketChartDto>()
+        } catch (e: Exception) {
+            throw CoinGeckoException("Failed to parse CoinGecko history response for '$id'", e)
+        }
+
+        return dto.toPricePoints()
     }
 }
