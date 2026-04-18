@@ -10,16 +10,32 @@
 <div class="page">
     <header class="header">
         <h1>CryptoPulse</h1>
-        <p class="subtitle">Cryptocurrency list served by the Ktor backend</p>
+        <p class="subtitle">Real-time cryptocurrency dashboard powered by Ktor</p>
     </header>
 
     <main>
         <section class="card">
-            <h2>Assets</h2>
-            <button id="load-assets-button">Load assets</button>
-            <p id="status-text">Nothing has been loaded yet.</p>
+            <div class="card-header">
+                <h2>Assets</h2>
+                <button id="reload-button">Reload</button>
+            </div>
 
-            <ul id="assets-list"></ul>
+            <p id="status-text">Loading assets...</p>
+
+            <div class="table-wrapper">
+                <table id="assets-table" class="assets-table hidden">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Symbol</th>
+                        <th>Price</th>
+                        <th>Market Cap</th>
+                        <th>Details</th>
+                    </tr>
+                    </thead>
+                    <tbody id="assets-table-body"></tbody>
+                </table>
+            </div>
         </section>
     </main>
 </div>
