@@ -1,7 +1,5 @@
 package com.pulse.crypto.routes
 
-import com.pulse.crypto.clients.exceptions.CoinGeckoException
-import com.pulse.crypto.clients.exceptions.CoinNotFoundException
 import com.pulse.crypto.services.AssetService
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.BadRequestException
