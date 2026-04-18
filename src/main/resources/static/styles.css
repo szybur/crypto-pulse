@@ -96,3 +96,67 @@ button:hover {
 .hidden {
     display: none;
 }
+
+.asset-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.asset-image {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+    border-radius: 12px;
+    background: #f9fafb;
+    padding: 8px;
+}
+
+.muted {
+    color: #6b7280;
+    margin: 4px 0 0 0;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.detail-box {
+    background: #f9fafb;
+    border-radius: 10px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.detail-label {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.detail-value {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.details-section {
+    margin-top: 24px;
+}
+
+.details-section h3 {
+    margin-bottom: 8px;
+}
+
+.history-list {
+    margin: 12px 0 0 0;
+    padding-left: 20px;
+}
+
+.history-list li {
+    margin-bottom: 8px;
+}

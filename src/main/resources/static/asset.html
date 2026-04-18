@@ -10,15 +10,70 @@
 <div class="page">
     <header class="header">
         <h1>Asset Details</h1>
-        <p class="subtitle">Details page placeholder</p>
+        <p class="subtitle">Detailed information for a selected cryptocurrency</p>
     </header>
 
     <main>
         <section class="card">
-            <p>This page will display details for the selected asset.</p>
-            <p><a class="details-link" href="/">Back to dashboard</a></p>
+            <p><a class="details-link" href="/">← Back to dashboard</a></p>
+
+            <p id="details-status-text">Loading asset details...</p>
+
+            <div id="details-content" class="hidden">
+                <div class="asset-header">
+                    <img id="asset-image" class="asset-image hidden" alt="Asset logo" />
+                    <div>
+                        <h2 id="asset-name">-</h2>
+                        <p id="asset-symbol" class="muted">-</p>
+                    </div>
+                </div>
+
+                <div class="details-grid">
+                    <div class="detail-box">
+                        <span class="detail-label">Current Price</span>
+                        <span id="asset-price" class="detail-value">-</span>
+                    </div>
+
+                    <div class="detail-box">
+                        <span class="detail-label">Market Cap</span>
+                        <span id="asset-market-cap" class="detail-value">-</span>
+                    </div>
+
+                    <div class="detail-box">
+                        <span class="detail-label">Market Cap Rank</span>
+                        <span id="asset-rank" class="detail-value">-</span>
+                    </div>
+
+                    <div class="detail-box">
+                        <span class="detail-label">24h Change</span>
+                        <span id="asset-change-24h" class="detail-value">-</span>
+                    </div>
+                </div>
+
+                <section class="details-section">
+                    <h3>Description</h3>
+                    <p id="asset-description">No description available.</p>
+                </section>
+
+                <section class="details-section">
+                    <h3>Homepage</h3>
+                    <p>
+                        <a id="asset-homepage" class="details-link" href="#" target="_blank" rel="noopener noreferrer">
+                            Not available
+                        </a>
+                    </p>
+                </section>
+
+                <section class="details-section">
+                    <h3>Price History (last 7 days)</h3>
+                    <p id="history-status-text">Loading price history...</p>
+                    <ul id="history-list" class="history-list hidden"></ul>
+                </section>
+            </div>
         </section>
     </main>
 </div>
+
+<script src="/asset.js"></script>
 </body>
 </html>
