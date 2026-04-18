@@ -7,5 +7,6 @@ fun Application.configureRoutes() {
     routing {
         healthRoutes()
         assetRoutes()
+        staticRoutes()
     }
 }
