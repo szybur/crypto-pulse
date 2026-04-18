@@ -160,3 +160,47 @@ button:hover {
 .history-list li {
     margin-bottom: 8px;
 }
+
+.chart-wrapper {
+    margin-top: 16px;
+    background: #f9fafb;
+    border-radius: 12px;
+    padding: 12px;
+}
+
+.history-chart {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.chart-label {
+    font-size: 12px;
+    fill: #6b7280;
+}
+
+.chart-grid-line {
+    stroke: #e5e7eb;
+    stroke-width: 1;
+}
+
+.chart-line {
+    fill: none;
+    stroke: #2563eb;
+    stroke-width: 3;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+}
+
+.chart-point {
+    fill: #2563eb;
+}
+
+.chart-axis {
+    stroke: #9ca3af;
+    stroke-width: 1;
+}
+
+.hidden {
+    display: none;
+}
