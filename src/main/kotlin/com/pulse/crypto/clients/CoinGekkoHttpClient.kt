@@ -3,6 +3,7 @@ package com.pulse.crypto.clients
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.DefaultRequest
+import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.DEFAULT
@@ -14,6 +15,7 @@ import io.ktor.http.URLProtocol
 import io.ktor.http.encodedPath
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import kotlin.time.Duration.Companion.seconds
 
 fun provideCoinGeckoHttpClient(apiKey: String): HttpClient {
     return HttpClient(CIO) {
@@ -32,10 +34,26 @@ fun provideCoinGeckoHttpClient(apiKey: String): HttpClient {
             level = LogLevel.INFO
         }
 
+        install(HttpRequestRetry) {
+            maxRetries = 2
+
+            retryIf { _, response ->
+                response.status.value >= 500
+            }
+
+            retryOnExceptionIf { _, cause ->
+                cause is java.net.SocketTimeoutException ||
+                        cause is io.ktor.client.network.sockets.ConnectTimeoutException ||
+                        cause is java.io.IOException
+            }
+
+            exponentialDelay()
+        }
+
         install(HttpTimeout) {
-            requestTimeoutMillis = 10_000
-            connectTimeoutMillis = 10_000
-            socketTimeoutMillis = 10_000
+            requestTimeoutMillis = 10.seconds.inWholeMilliseconds
+            connectTimeoutMillis = 5.seconds.inWholeMilliseconds
+            socketTimeoutMillis = 10.seconds.inWholeMilliseconds
         }
 
         install(DefaultRequest) {

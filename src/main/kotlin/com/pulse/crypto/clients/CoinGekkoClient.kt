@@ -1,6 +1,5 @@
 package com.pulse.crypto.clients
 
-
 import com.pulse.crypto.clients.exceptions.CoinGeckoException
 import com.pulse.crypto.clients.exceptions.CoinNotFoundException
 import com.pulse.crypto.models.domain.AssetDetails
@@ -18,10 +17,13 @@ import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.isSuccess
+import org.slf4j.LoggerFactory
 
 class CoinGeckoClient(
     private val httpClient: HttpClient
 ) {
+    private val logger = LoggerFactory.getLogger(CoinGeckoClient::class.java)
+
     suspend fun getMarkets(
         vsCurrency: String = "usd",
         page: Int = 1,
@@ -37,10 +39,12 @@ class CoinGeckoClient(
                 parameter("locale", "en")
             }
         } catch (e: Exception) {
+            logger.error("Failed to fetch markets from CoinGecko", e)
             throw CoinGeckoException("Failed to fetch markets from CoinGecko", e)
         }
 
         if (!response.status.isSuccess()) {
+            logger.warn("CoinGecko markets call returned status {}", response.status.value)
             throw CoinGeckoException("CoinGecko returned HTTP ${response.status.value}")
         }
 
@@ -66,11 +70,13 @@ class CoinGeckoClient(
                 parameter("sparkline", false)
             }
         } catch (e: ClientRequestException) {
+            logger.error("Client error while fetching asset details for '{}'", id, e)
             if (e.response.status == HttpStatusCode.NotFound) {
                 throw CoinNotFoundException(id)
             }
             throw CoinGeckoException("CoinGecko request failed for id '$id'", e)
         } catch (e: Exception) {
+            logger.error("Failed to fetch asset details for '{}'", id, e)
             throw CoinGeckoException("Failed to fetch asset details for '$id'", e)
         }
 
@@ -78,6 +84,7 @@ class CoinGeckoClient(
             if (response.status == HttpStatusCode.NotFound) {
                 throw CoinNotFoundException(id)
             }
+            logger.warn("CoinGecko details call for '{}' returned status {}", id, response.status.value)
             throw CoinGeckoException("CoinGecko returned HTTP ${response.status.value} for id '$id'")
         }
 
@@ -105,15 +112,18 @@ class CoinGeckoClient(
                 parameter("interval", "hourly")
             }
         } catch (e: ClientRequestException) {
+            logger.warn("CoinGecko history call for '{}' retuned client request error {}", id, e.message)
             if (e.response.status == HttpStatusCode.NotFound) {
                 throw CoinNotFoundException(id)
             }
             throw CoinGeckoException("CoinGecko request failed for history id '$id'", e)
         } catch (e: Exception) {
+            logger.warn("Failed to fetch asset history for '{}'",id)
             throw CoinGeckoException("Failed to fetch asset history for '$id'", e)
         }
 
         if (!response.status.isSuccess()) {
+            logger.warn("CoinGecko history call for '{}' returned status {}", id, response.status.value)
             if (response.status == HttpStatusCode.NotFound) {
                 throw CoinNotFoundException(id)
             }
@@ -123,6 +133,7 @@ class CoinGeckoClient(
         val dto = try {
             response.body<CoinMarketChartDto>()
         } catch (e: Exception) {
+            logger.warn("Failed to parse CoinGecko history response for {}", id)
             throw CoinGeckoException("Failed to parse CoinGecko history response for '$id'", e)
         }
 
