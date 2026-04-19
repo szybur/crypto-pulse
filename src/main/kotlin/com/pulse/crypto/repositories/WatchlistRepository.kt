@@ -2,6 +2,7 @@ package com.pulse.crypto.repositories
 
 import com.pulse.crypto.db.WatchlistTable
 import com.pulse.crypto.models.domain.WatchlistItem
+import com.pulse.crypto.repositories.exceptions.WatchlistDuplicateException
 import com.pulse.crypto.repositories.mappers.toWatchlistItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -40,7 +41,7 @@ class WatchlistRepository {
                 .count() > 0
 
             if (alreadyExists) {
-                error("Asset '$assetId' is already on the watchlist")
+                throw WatchlistDuplicateException(assetId)
             }
 
             val insertedRow = WatchlistTable.insert {

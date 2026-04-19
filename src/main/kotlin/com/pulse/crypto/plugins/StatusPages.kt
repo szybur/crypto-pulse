@@ -2,6 +2,7 @@ package com.pulse.crypto.plugins
 
 import com.pulse.crypto.clients.exceptions.CoinGeckoException
 import com.pulse.crypto.clients.exceptions.CoinNotFoundException
+import com.pulse.crypto.repositories.exceptions.WatchlistDuplicateException
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
@@ -47,6 +48,14 @@ fun Application.configureStatusPages() {
             call.respond(
                 HttpStatusCode.BadGateway,
                 mapOf("error" to (cause.message ?: "Upstream API error"))
+            )
+        }
+
+        exception<WatchlistDuplicateException> { call, cause ->
+            logger.warn("Watchlist duplicate: {}", cause.assetId)
+            call.respond(
+                HttpStatusCode.Conflict,
+                mapOf("error" to "Asset '${cause.assetId}' is already on the watchlist")
             )
         }
 
