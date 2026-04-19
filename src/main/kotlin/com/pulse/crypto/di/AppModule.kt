@@ -2,8 +2,10 @@ package com.pulse.crypto.di
 
 import com.pulse.crypto.clients.CoinGeckoClient
 import com.pulse.crypto.clients.provideCoinGeckoHttpClient
+import com.pulse.crypto.repositories.WatchlistRepository
 import com.pulse.crypto.services.AssetService
 import com.pulse.crypto.services.HealthService
+import com.pulse.crypto.services.WatchlistService
 import org.koin.dsl.module
 
 val appModule = module {
@@ -18,4 +20,7 @@ val appModule = module {
 
     single { CoinGeckoClient(get()) }
     single { AssetService(get()) }
+
+    single { WatchlistRepository() }
+    single { WatchlistService(get()) }
 }
