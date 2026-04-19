@@ -30,10 +30,33 @@
                         <th>Symbol</th>
                         <th>Price</th>
                         <th>Market Cap</th>
+                        <th>Watchlist</th>
                         <th>Details</th>
                     </tr>
                     </thead>
                     <tbody id="assets-table-body"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="card-header">
+                <h2>Watchlist</h2>
+            </div>
+
+            <p id="watchlist-status-text">Loading watchlist...</p>
+
+            <div class="table-wrapper">
+                <table id="watchlist-table" class="assets-table hidden">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Symbol</th>
+                        <th>Added At</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody id="watchlist-table-body"></tbody>
                 </table>
             </div>
         </section>
