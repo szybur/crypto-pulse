@@ -1,5 +1,6 @@
 package com.pulse.crypto
 
+import com.pulse.crypto.db.DatabaseFactory
 import com.pulse.crypto.di.appModule
 import com.pulse.crypto.plugins.configureMonitoring
 import com.pulse.crypto.plugins.configureSerialization
@@ -16,6 +17,7 @@ fun main(args: Array<String>) {
 }
 
 fun Application.module() {
+    DatabaseFactory.init()
     install(Koin) {
         slf4jLogger()
         configureMonitoring()
