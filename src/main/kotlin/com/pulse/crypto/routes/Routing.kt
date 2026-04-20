@@ -8,6 +8,7 @@ fun Application.configureRoutes() {
         healthRoutes()
         assetRoutes()
         watchlistRoutes()
+        statusRoutes()
         staticRoutes()
     }
 }
