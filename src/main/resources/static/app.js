@@ -1,4 +1,3 @@
-const reloadButton = document.getElementById("reload-button");
 const statusText = document.getElementById("status-text");
 const assetsTable = document.getElementById("assets-table");
 const assetsTableBody = document.getElementById("assets-table-body");
@@ -6,6 +5,10 @@ const assetsTableBody = document.getElementById("assets-table-body");
 const watchlistStatusText = document.getElementById("watchlist-status-text");
 const watchlistTable = document.getElementById("watchlist-table");
 const watchlistTableBody = document.getElementById("watchlist-table-body");
+
+const refreshButton = document.getElementById("refresh-button");
+const syncStatusText = document.getElementById("sync-status-text");
+const syncLastRunText = document.getElementById("sync-last-run-text");
 
 let currentAssets = [];
 let currentWatchlist = [];
@@ -176,6 +179,55 @@ function renderWatchlist(watchlist) {
     watchlistTable.classList.remove("hidden");
 }
 
+async function fetchSyncStatus() {
+    const response = await fetch("/api/status/sync");
+
+    if (!response.ok) {
+        throw new Error(`Failed to load sync status. HTTP ${response.status}`);
+    }
+
+    return response.json();
+}
+
+function renderSyncStatus(status) {
+    if (!status) {
+        syncStatusText.textContent = "Sync status unavailable.";
+        syncLastRunText.textContent = "Last refresh: unknown";
+        refreshButton.disabled = false;
+        refreshButton.textContent = "Refresh assets";
+        return;
+    }
+
+    syncStatusText.textContent = `Status: ${status.message || "Idle"}`;
+
+    if (status.lastRunAt) {
+        syncLastRunText.textContent = `Last refresh: ${formatDate(status.lastRunAt)}`;
+    } else {
+        syncLastRunText.textContent = "Last refresh: never";
+    }
+
+    if (status.running) {
+        refreshButton.disabled = true;
+        refreshButton.textContent = "Refreshing...";
+    } else {
+        refreshButton.disabled = false;
+        refreshButton.textContent = "Refresh assets";
+    }
+}
+
+async function triggerRefresh() {
+    const response = await fetch("/api/refresh", {
+        method: "POST"
+    });
+
+    if (!response.ok) {
+        const errorText = await safeReadError(response);
+        throw new Error(errorText || `Failed to refresh assets. HTTP ${response.status}`);
+    }
+
+    return response.json();
+}
+
 async function loadDashboard() {
     statusText.textContent = "Loading assets...";
     watchlistStatusText.textContent = "Loading watchlist...";
@@ -187,13 +239,16 @@ async function loadDashboard() {
     watchlistTableBody.innerHTML = "";
 
     try {
-        const [assets, watchlist] = await Promise.all([
+        const [assets, watchlist, syncStatus] = await Promise.all([
             fetchAssets(),
-            fetchWatchlist()
+            fetchWatchlist(),
+            fetchSyncStatus()
         ]);
 
         currentAssets = assets;
         currentWatchlist = watchlist;
+
+        renderSyncStatus(syncStatus);
 
         if (!Array.isArray(assets) || assets.length === 0) {
             statusText.textContent = "No assets found.";
@@ -268,6 +323,20 @@ watchlistTableBody.addEventListener("click", async (event) => {
     }
 });
 
-reloadButton.addEventListener("click", loadDashboard);
+refreshButton.addEventListener("click", async () => {
+    try {
+        refreshButton.disabled = true;
+        refreshButton.textContent = "Refreshing...";
+        syncStatusText.textContent = "Status: Refreshing assets...";
+
+        await triggerRefresh();
+        await loadDashboard();
+    } catch (error) {
+        console.error(error);
+        syncStatusText.textContent = `Status: ${error.message || "Refresh failed."}`;
+        refreshButton.disabled = false;
+        refreshButton.textContent = "Refresh assets";
+    }
+});
 
 loadDashboard();

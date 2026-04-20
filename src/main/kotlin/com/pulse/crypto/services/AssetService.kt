@@ -1,6 +1,5 @@
 package com.pulse.crypto.services
 
-import com.pulse.crypto.clients.CoinGeckoClient
 import com.pulse.crypto.models.domain.AssetDetails
 import com.pulse.crypto.models.domain.AssetScreenData
 import com.pulse.crypto.models.domain.AssetSummary
@@ -10,18 +9,25 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 
 class AssetService(
-    private val coinGeckoClient: CoinGeckoClient,
-    private val watchlistRepository: WatchlistRepository
+    private val coinGeckoAssetService: CoinGeckoAssetService,
+    private val watchlistRepository: WatchlistRepository,
+    private val assetCacheService: AssetCacheService
 ) {
     suspend fun getAssets(): List<AssetSummary> {
-        return coinGeckoClient.getMarkets()
+        val cached = assetCacheService.getCurrentAssets()
+        if (cached.isNotEmpty()) {
+            return cached
+        }
+        val freshAssets = coinGeckoAssetService.fetchAssetsFromRemote()
+        assetCacheService.updateAssets(freshAssets)
+        return freshAssets
     }
 
     suspend fun getAssetDetails(id: String): AssetDetails =
-        coinGeckoClient.getAssetDetails(id)
+        coinGeckoAssetService.getAssetDetails(id)
 
     suspend fun getAssetHistory(id: String, days: Int): List<PricePoint> =
-        coinGeckoClient.getAssetHistory(id = id, days = days)
+        coinGeckoAssetService.getAssetHistory(id, days)
 
     suspend fun getAssetScreenData(id: String, days: Int = 7): AssetScreenData = coroutineScope {
         val details = async { getAssetDetails(id) }

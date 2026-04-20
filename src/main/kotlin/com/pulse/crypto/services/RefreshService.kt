@@ -9,7 +9,8 @@ import org.slf4j.LoggerFactory
 import java.time.Instant
 
 class RefreshService(
-    private val assetService: AssetService
+    private val coinGeckoAssetService: CoinGeckoAssetService,
+    private val assetCacheService: AssetCacheService
 ) {
     private val logger = LoggerFactory.getLogger(RefreshService::class.java)
 
@@ -34,7 +35,8 @@ class RefreshService(
         }
 
         try {
-            val assets = assetService.getAssets()
+            val assets = coinGeckoAssetService.fetchAssetsFromRemote()
+            assetCacheService.updateAssets(assets)
 
             _status.value = SyncStatus(
                 running = false,
