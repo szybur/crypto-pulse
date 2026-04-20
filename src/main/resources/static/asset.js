@@ -252,27 +252,14 @@ function renderHistory(history) {
     renderHistoryChart(history);
 }
 
-async function loadAssetDetails(assetId) {
-    const response = await fetch(`/api/assets/${encodeURIComponent(assetId)}`);
+async function loadAssetScreenData(assetId) {
+    const response = await fetch(`/api/assets/${encodeURIComponent(assetId)}/screen?days=7`);
 
     if (!response.ok) {
         if (response.status === 404) {
             throw new Error("Asset not found.");
         }
-        throw new Error(`Failed to load asset details. HTTP ${response.status}`);
-    }
-
-    return response.json();
-}
-
-async function loadAssetHistory(assetId) {
-    const response = await fetch(`/api/assets/${encodeURIComponent(assetId)}/history?days=7`);
-
-    if (!response.ok) {
-        if (response.status === 404) {
-            throw new Error("Price history not found.");
-        }
-        throw new Error(`Failed to load asset history. HTTP ${response.status}`);
+        throw new Error(`Failed to load asset screen data. HTTP ${response.status}`);
     }
 
     return response.json();
@@ -289,25 +276,17 @@ async function initializePage() {
     }
 
     try {
-        const asset = await loadAssetDetails(assetId);
-        renderAssetDetails(asset);
+        const screenData = await loadAssetScreenData(assetId);
+
+        renderAssetDetails(screenData.details);
+        renderHistory(screenData.history);
 
         detailsStatusText.textContent = "";
         detailsContent.classList.remove("hidden");
     } catch (error) {
         console.error(error);
-        detailsStatusText.textContent = error.message || "Failed to load asset details.";
+        detailsStatusText.textContent = error.message || "Failed to load asset screen data.";
         historyStatusText.textContent = "History could not be loaded.";
-        chartWrapper.classList.add("hidden");
-        return;
-    }
-
-    try {
-        const history = await loadAssetHistory(assetId);
-        renderHistory(history);
-    } catch (error) {
-        console.error(error);
-        historyStatusText.textContent = error.message || "Failed to load price history.";
         chartWrapper.classList.add("hidden");
     }
 }
