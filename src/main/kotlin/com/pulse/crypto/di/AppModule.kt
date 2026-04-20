@@ -19,7 +19,7 @@ val appModule = module {
     }
 
     single { CoinGeckoClient(get()) }
-    single { AssetService(get()) }
+    single { AssetService(get(), get()) }
 
     single { WatchlistRepository() }
     single { WatchlistService(get()) }

@@ -34,4 +34,16 @@ fun Route.assetRoutes() {
         val history = assetService.getAssetHistory(id, days)
         call.respond(HttpStatusCode.OK, history)
     }
+
+    get("/api/assets/{id}/screen") {
+        val id = call.parameters["id"]?.trim()
+            ?: throw BadRequestException("Missing asset id")
+
+        val days = call.request.queryParameters["days"]?.toIntOrNull() ?: 7
+
+        require(days > 0) { "Query parameter 'days' must be greater than 0" }
+
+        val screenData = assetService.getAssetScreenData(id, days)
+        call.respond(HttpStatusCode.OK, screenData)
+    }
 }
