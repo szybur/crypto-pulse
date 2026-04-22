@@ -9,6 +9,7 @@ import com.pulse.crypto.services.CoinGeckoAssetService
 import com.pulse.crypto.services.HealthService
 import com.pulse.crypto.services.RefreshService
 import com.pulse.crypto.services.WatchlistService
+import com.pulse.crypto.streams.PriceEventBus
 import org.koin.dsl.module
 
 val appModule = module {
@@ -30,4 +31,6 @@ val appModule = module {
     single { WatchlistService(get()) }
 
     single { RefreshService(get(), get()) }
+
+    single { PriceEventBus() }
 }

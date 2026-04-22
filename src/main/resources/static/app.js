@@ -10,6 +10,8 @@ const refreshButton = document.getElementById("refresh-button");
 const syncStatusText = document.getElementById("sync-status-text");
 const syncLastRunText = document.getElementById("sync-last-run-text");
 
+const liveStatusText = document.getElementById("live-status-text");
+
 let currentAssets = [];
 let currentWatchlist = [];
 
@@ -121,7 +123,7 @@ function renderAssets(assets) {
         row.innerHTML = `
             <td>${asset.name}</td>
             <td>${asset.symbol.toUpperCase()}</td>
-            <td>${formatPrice(asset.currentPrice)}</td>
+            <td data-price-for="${asset.id}">${formatPrice(asset.currentPrice)}</td>
             <td>${formatMarketCap(asset.marketCap)}</td>
             <td>
                 <button
@@ -266,6 +268,42 @@ async function loadDashboard() {
     }
 }
 
+function updateAssetPriceInUi(event) {
+    const priceCell = document.querySelector(`[data-price-for="${event.assetId}"]`);
+
+    if (priceCell) {
+        priceCell.textContent = formatPrice(event.price);
+    }
+
+    const asset = currentAssets.find(item => item.id === event.assetId);
+    if (asset) {
+        asset.currentPrice = event.price;
+    }
+}
+
+function connectPriceEvents() {
+    const eventSource = new EventSource("/api/events/prices");
+
+    eventSource.onopen = () => {
+        liveStatusText.textContent = "Live connection: connected";
+    };
+
+    eventSource.addEventListener("price-update", (event) => {
+        try {
+            const data = JSON.parse(event.data);
+            updateAssetPriceInUi(data);
+        } catch (error) {
+            console.error("Failed to parse SSE event:", error);
+        }
+    });
+
+    eventSource.onerror = () => {
+        liveStatusText.textContent = "Live connection: reconnecting...";
+    };
+
+    return eventSource;
+}
+
 assetsTableBody.addEventListener("click", async (event) => {
     const button = event.target.closest("button[data-action]");
 
@@ -339,4 +377,5 @@ refreshButton.addEventListener("click", async () => {
     }
 });
 
+connectPriceEvents();
 loadDashboard();

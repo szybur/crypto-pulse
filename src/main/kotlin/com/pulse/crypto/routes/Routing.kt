@@ -9,6 +9,7 @@ fun Application.configureRoutes() {
         assetRoutes()
         watchlistRoutes()
         statusRoutes()
+        streamRoutes()
         staticRoutes()
     }
 }
