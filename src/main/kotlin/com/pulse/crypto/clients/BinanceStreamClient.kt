@@ -56,5 +56,6 @@ class BinanceStreamClient(
                 }
             }
         }
+        throw IllegalStateException("Binance websocket stream completed unexpectedly")
     }
 }
