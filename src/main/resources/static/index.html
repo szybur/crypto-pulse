@@ -14,7 +14,7 @@
     </header>
 
     <main>
-        <p id="live-status-text">Live connection: connecting...</p>
+
 
         <section class="card">
             <div class="card-header">
@@ -22,6 +22,12 @@
                 <button id="refresh-button">Refresh assets</button>
             </div>
 
+            <div class="live-status-row">
+                <span>Live updates:</span>
+                <span id="live-status-badge" class="status-badge status-reconnecting">
+        RECONNECTING
+    </span>
+            </div>
             <p id="sync-status-text">Loading sync status...</p>
             <p id="sync-last-run-text">Last refresh: never</p>
         </section>

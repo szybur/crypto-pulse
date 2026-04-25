@@ -10,7 +10,7 @@ const refreshButton = document.getElementById("refresh-button");
 const syncStatusText = document.getElementById("sync-status-text");
 const syncLastRunText = document.getElementById("sync-last-run-text");
 
-const liveStatusText = document.getElementById("live-status-text");
+const liveStatusBadge = document.getElementById("live-status-badge");
 
 let currentAssets = [];
 let currentWatchlist = [];
@@ -281,11 +281,36 @@ function updateAssetPriceInUi(event) {
     }
 }
 
+function setLiveStatus(status) {
+    liveStatusBadge.classList.remove(
+        "status-live",
+        "status-reconnecting",
+        "status-offline"
+    );
+
+    if (status === "live") {
+        liveStatusBadge.textContent = "LIVE";
+        liveStatusBadge.classList.add("status-live");
+        return;
+    }
+
+    if (status === "reconnecting") {
+        liveStatusBadge.textContent = "RECONNECTING";
+        liveStatusBadge.classList.add("status-reconnecting");
+        return;
+    }
+
+    liveStatusBadge.textContent = "OFFLINE";
+    liveStatusBadge.classList.add("status-offline");
+}
+
 function connectPriceEvents() {
+    setLiveStatus("reconnecting");
+
     const eventSource = new EventSource("/api/events/prices");
 
     eventSource.onopen = () => {
-        liveStatusText.textContent = "Live connection: connected";
+        setLiveStatus("live");
     };
 
     eventSource.addEventListener("price-update", (event) => {
@@ -298,7 +323,11 @@ function connectPriceEvents() {
     });
 
     eventSource.onerror = () => {
-        liveStatusText.textContent = "Live connection: reconnecting...";
+        if (eventSource.readyState === EventSource.CLOSED) {
+            setLiveStatus("offline");
+        } else {
+            setLiveStatus("reconnecting");
+        }
     };
 
     return eventSource;
