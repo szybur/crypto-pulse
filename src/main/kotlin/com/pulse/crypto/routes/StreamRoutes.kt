@@ -55,7 +55,8 @@ fun Route.streamRoutes() {
 
         val event = PriceUpdateEvent(
             assetId = "bitcoin",
-            symbol = "btc",
+            assetSymbol = "btc",
+            marketSymbol = "btcusdt",
             price = mockPrice,
             timestamp = Clock.System.now().toString(),
             source = "mock"

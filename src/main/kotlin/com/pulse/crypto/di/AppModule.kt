@@ -1,28 +1,32 @@
 package com.pulse.crypto.di
 
+import com.pulse.crypto.clients.BinanceStreamClient
 import com.pulse.crypto.clients.CoinGeckoClient
+import com.pulse.crypto.clients.provideBinanceHttpClient
 import com.pulse.crypto.clients.provideCoinGeckoHttpClient
 import com.pulse.crypto.repositories.WatchlistRepository
 import com.pulse.crypto.services.AssetCacheService
 import com.pulse.crypto.services.AssetService
+import com.pulse.crypto.services.BinancePriceStreamService
 import com.pulse.crypto.services.CoinGeckoAssetService
 import com.pulse.crypto.services.HealthService
 import com.pulse.crypto.services.RefreshService
 import com.pulse.crypto.services.WatchlistService
 import com.pulse.crypto.streams.PriceEventBus
 import org.koin.dsl.module
+import org.koin.core.qualifier.named
 
 val appModule = module {
     single { HealthService() }
 
-    single {
+    single(named("coinGeckoHttpClient")) {
         provideCoinGeckoHttpClient(
             apiKey = System.getProperty("COINGECKO_DEMO_API_KEY")
                 ?: error("Missing COINGECKO_DEMO_API_KEY")
         )
     }
 
-    single { CoinGeckoClient(get()) }
+    single { CoinGeckoClient(get(named("coinGeckoHttpClient"))) }
     single { AssetCacheService() }
     single { CoinGeckoAssetService(get()) }
     single { AssetService(get(), get(), get()) }
@@ -33,4 +37,10 @@ val appModule = module {
     single { RefreshService(get(), get()) }
 
     single { PriceEventBus() }
+
+    single(named("binanceHttpClient")) {
+        provideBinanceHttpClient()
+    }
+    single { BinanceStreamClient(get(named("binanceHttpClient"))) }
+    single { BinancePriceStreamService(get(), get()) }
 }
